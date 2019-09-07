@@ -86,7 +86,9 @@ public class RulerPanel extends JPanel {
           int lastValidIndex = combo.getLastValidIndex();
           RulerData rd = (RulerData) combo.getItemAt(lastValidIndex);
           boolean b = ((JCheckBox) e.getSource()).isSelected();
-          rd.setEnabled(b);
+          if (rd != null) {
+            rd.setEnabled(b);
+          }
           jtbDefaultOperation.setEnabled(b);
           jtfText.setEnabled(b);
         }

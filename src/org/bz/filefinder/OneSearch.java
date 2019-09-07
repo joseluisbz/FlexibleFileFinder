@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -83,7 +84,6 @@ public class OneSearch extends JPanel {
     treeFiles.setRootVisible(false);
     treeLines.setRootVisible(false);
   }
-
 
   /**
    * This method is called from within the constructor to initialize the form.
@@ -641,6 +641,12 @@ public class OneSearch extends JPanel {
 
   private void addPathToTreeLines(String canonicalFolder, Path path, RulerData[] words) {
     try {
+      Font monoPlain12 = new Font("Monospaced", Font.PLAIN, 12);
+      Font monoBold12 = monoPlain12.deriveFont(Font.BOLD);
+      Color redColor = new Color(153, 0, 0);
+      Color greenColor = new Color(0, 102, 0);
+      Color blueColor = new Color(0, 0, 204);
+
       File file = path.toFile();
       if (file != null) {
         DefaultTreeModel treeModel = ((DefaultTreeModel) treeLines.getModel());
@@ -658,25 +664,30 @@ public class OneSearch extends JPanel {
             while ((line = lnr.readLine()) != null) {
               for (RulerData word : words) {
                 if (line.contains(word.getText())) {
-                  String indicator = new StringBuilder("Line ")
-                      .append(String.valueOf(lnr.getLineNumber()))
-                      .append(" : ").toString();
-                  int position = line.indexOf(word.getText());
-                  String before = line.substring(0, position);
-                  String after = line.substring(position + word.getText().length(),
-                      line.length());
-
-                  Font monoPlain12 = new Font("Monospaced", Font.PLAIN, 12);
-                  Color redColor = new Color(153, 0, 0);
-                  Color greenColor = new Color(0, 102, 0);
-                  Color blueColor = new Color(0, 0, 204);
-                  DecoratedText[] arrayLine = new DecoratedText[]{
-                    new DecoratedText(indicator, redColor, monoPlain12),
-                    new DecoratedText(before, blueColor, monoPlain12),
-                    new DecoratedText(word.getText(), greenColor, monoPlain12),
-                    new DecoratedText(after, blueColor, monoPlain12)
-                  };
-                  fileTreeNode.add(new DecoratedTextMutableTreeNode(arrayLine, false));
+                  int initialFind = 0;
+                  int position;
+                  do {
+                    position = line.indexOf(word.getText(), initialFind);
+                    initialFind = position + 1;
+                    if (position > 0) {
+                      String indicator = new StringBuilder("Line ")
+                          .append(getStringPaddedL(' ', 6, String.valueOf(lnr.getLineNumber())))
+                          .append(":")
+                          .append(getStringPaddedR(' ', 6, String.valueOf(position)))
+                          .toString();
+                      String before = line.substring(0, position);
+                      String after = line.substring(position + word.getText().length(),
+                          line.length());
+                      
+                      DecoratedText[] arrayLine = new DecoratedText[]{
+                        new DecoratedText(indicator, redColor, monoPlain12),
+                        new DecoratedText(before, blueColor, monoPlain12),
+                        new DecoratedText(word.getText(), greenColor, monoBold12),
+                        new DecoratedText(after, blueColor, monoPlain12)
+                      };
+                      fileTreeNode.add(new DecoratedTextMutableTreeNode(arrayLine, false));
+                    }
+                  } while (position != -1);
                 }
               }
             }
@@ -886,6 +897,21 @@ public class OneSearch extends JPanel {
         + " of the Method:" + rootCause.getStackTrace()[0].getMethodName()
         + ", Class:" + rootCause.getStackTrace()[0].getClassName()
         + " was presented the Exception:\n\t" + rootCause.toString());
+  }
+
+  public static String getPadded(char c, int p, String s) {
+    //Return a String filled character 'c' characters with (p s.length()) length 
+    char[] chars = new char[p - s.length()];
+    Arrays.fill(chars, c);
+    return new String(chars);
+  }
+
+  public static String getStringPaddedL(char c, int p, String s) {
+    return getPadded(c, p, s) + s;
+  }
+
+  public static String getStringPaddedR(char c, int p, String s) {
+    return s + getPadded(c, p, s);
   }
 
   class SwingWorkerSearcher extends SwingWorker<Void, SearchDTO> {
