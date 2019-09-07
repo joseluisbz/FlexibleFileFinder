@@ -53,6 +53,13 @@ public class OneSearch extends JPanel {
   private final RulerComboBox usedWords;
   private static final String FS = System.getProperty("file.separator");
   public static final String NL = System.getProperty("line.separator");
+  
+  private final Font monoPlain12 = new Font("Monospaced", Font.PLAIN, 12);
+  private final Font monoBold12 = monoPlain12.deriveFont(Font.BOLD);
+  private final Color redColor = new Color(153, 0, 0);
+  private final Color greenColor = new Color(0, 102, 0);
+  private final Color blueColor = new Color(0, 0, 204);
+  
   private SwingWorkerSearcher swSearcher;
   private final Searcher searcher = new Searcher();
   private final DefaultTableModel INITIAL_TABLE_MODEL = new DefaultTableModel(
@@ -641,11 +648,6 @@ public class OneSearch extends JPanel {
 
   private void addPathToTreeLines(String canonicalFolder, Path path, RulerData[] words) {
     try {
-      Font monoPlain12 = new Font("Monospaced", Font.PLAIN, 12);
-      Font monoBold12 = monoPlain12.deriveFont(Font.BOLD);
-      Color redColor = new Color(153, 0, 0);
-      Color greenColor = new Color(0, 102, 0);
-      Color blueColor = new Color(0, 0, 204);
 
       File file = path.toFile();
       if (file != null) {
